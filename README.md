@@ -1,70 +1,125 @@
-```markdown
+
 # pr-reviewer-ai 🚀
 
 [![Stars](https://img.shields.io/github/stars/Shaid-T/pr-reviewer-ai?style=social)](https://github.com/Shaid-T/pr-reviewer-ai/stargazers)
-[![CI](https://img.shields.io/github/actions/workflow/status/Shaid-T/pr-reviewer-ai/ci.yml?branch=main)](https://github.com/Shaid-T/pr-reviewer-ai/actions)
+[![Build](https://img.shields.io/github/actions/workflow/status/Shaid-T/pr-reviewer-ai/ci.yml?branch=main)](https://github.com/Shaid-T/pr-reviewer-ai/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Issues Welcome](https://img.shields.io/badge/Issues-Good%20first%20issue-brightgreen.svg)](.github/ISSUE_TEMPLATE/good_first_issue.md)
 
-A privacy-first, production-ready GitHub Action + CLI that uses LLMs to automatically review pull requests: summarize diffs, surface security & style issues, propose changes, and post rich PR comments or check-run reports.
+> Fast, privacy-first automated PR reviews powered by LLMs — one-click GitHub Action + local CLI.
+> Summarize diffs, surface security/style issues, suggest fixes, and post rich PR comments or check-run reports.
 
-Why this project gets stars
-- Solves a universal problem: faster, higher-quality PR reviews for maintainers and contributors.
-- One-click Action & local CLI — easy to try and adopt.
-- Configurable prompts and provider-agnostic adapters (OpenAI, local LLMs).
-- Privacy-first defaults: dry-run mode when API keys aren't provided; optional PR commenting.
-- Extensible: add new checks (security, tests, linter suggestions) with simple plugin hooks.
+Why star this project?
+- Saves maintainers time by producing actionable, review-quality suggestions for PRs.
+- One-click GitHub Action and a local CLI so anyone can try it in minutes (dry-run mode included).
+- Provider-agnostic: works with OpenAI or self-hosted LLM adapters (privacy-friendly).
+- Lightweight, tested, and easy to extend with new checks or provider adapters.
 
-Demo (gif placeholder)
-![demo gif](./assets/demo.gif)
+Demo
+![demo gif placeholder](./assets/demo.gif)
 
-Quickstart — GitHub Action (one minute)
-1. Fork or add this repo as a template.
-2. Create a workflow file (.github/workflows/pr-review.yml) using the `pr-reviewer-ai` Action (example in /examples).
-3. Set repository secret: GITHUB_TOKEN (Actions provides one automatically). For cloud LLMs add OPENAI_API_KEY if you want live suggestions.
-4. Open a PR — the Action will attach a review summary.
+TL;DR — Try it in 60 seconds
+1. Add the Action example workflow (see /examples/pr-review.yml).
+2. (Optional) Add OPENAI_API_KEY secret to your repo for live LLM suggestions.
+3. Open a PR — the Action will run and post a summary (or produce an artifact).
 
-Local Quickstart (CLI)
+Quickstart — GitHub Action (recommended)
+1. Create a workflow file at .github/workflows/pr-review.yml with this minimal example:
+```yaml
+name: PR Review (LLM)
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  llm-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run PR reviewer
+        uses: ./  # use this repo as a local action or replace with user/repo@vX.Y
+        with:
+          model: "openai/gpt-4"
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} # optional
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}     # provided automatically in Actions
+```
+2. Open a PR — the Action runs in dry-run mode by default unless configured to post comments.
+
+Local Quickstart — CLI
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-# dry-run local review (no API keys required)
+# Dry-run: no API key required
 python -m pr_reviewer.cli review --path . --base main --head HEAD --dry-run --format markdown
+# With OpenAI (live suggestions)
+export OPENAI_API_KEY="sk-..."
+python -m pr_reviewer.cli review --path . --base main --head HEAD --format markdown
 ```
 
-Features
-- Concise summary, top issues, suggested fixes, checklist for authors.
-- Post summary as: PR comment, GitHub Check Run, or upload JSON artifact in CI.
-- Support for multiple LLM providers via adapter pattern.
-- Config file (.pr-reviewer.yml) for per-repo settings and templates.
-- Lightweight Docker image for reproducible CI runs.
+Key Features
+- Summaries: 1–3 line PR summary from the diff.
+- Top issues: prioritized list (security, correctness, tests, style).
+- Suggestions: concrete fixes, code snippets, commands.
+- Checklist: actionable next steps for the PR author.
+- Outputs: Markdown, JSON; post as PR comment or GitHub Check Run.
+- Extensible: add new check plugins (security scanner, lint integrations).
 
-Config example (.pr-reviewer.yml)
+Config (.pr-reviewer.yml)
 ```yaml
 model: openai/gpt-4
-comment_on_pr: true
-post_as_checkrun: true
+prompt_mode: succinct   # succinct | verbose
 max_tokens: 1200
-prompt_mode: succinct # succinct | verbose
+comment_on_pr: false    # Action mode: set true to post comments
+post_as_checkrun: true
 checks:
   - type: security
   - type: style
   - type: tests
 ```
 
-How you can help
-- Star the repo if you find it useful — it helps others discover it.
-- Try the CLI and one-click Action and open issues with feedback.
-- Add adapters for other LLM providers or new check plugins.
-
 Security & Privacy
-- Default dry-run prevents accidental data leakage.
-- Option to use self-hosted LLM adapters (no external calls).
-- When using public cloud LLMs, avoid sending full secrets or sensitive data; configure prompts to redact.
+- Dry-run by default when no OPENAI_API_KEY is present.
+- Supports local/self-hosted adapters so organizations can avoid sending code externally.
+- Do not include secrets or large sensitive artifacts in diffs you submit to third-party LLMs.
+- Use prompt redaction if your repo contains sensitive info.
+
+Integration examples
+- GitHub Action: post a comment summary or create a check-run with the reviewer output.
+- CI artifact: upload the JSON report for dashboards or further processing.
+- Bot mode: integrate with Slack/MS Teams to ping relevant engineers for high-risk changes.
+
+Best practices for adoption
+- Start with dry-run mode and review suggestions manually before enabling auto-comments.
+- Combine with existing linters and security scanners; use the LLM reviewer to produce human-friendly explanations and prioritized context.
+- Seed repository with a small set of "good first issue" tasks to attract contributors.
 
 Contributing
-- See CONTRIBUTING.md for development, tests, and how to add adapters.
-- Look for issues tagged "good first issue".
+We welcome contributions — here's how to help:
+- Open issues for feature requests or bugs.
+- Add an LLM provider by implementing an adapter class.
+- Add new checks under src/pr_reviewer/checks/.
+- Follow the code style: black and pylint; run tests with pytest.
+See CONTRIBUTING.md for details and the contributor checklist.
+
+Roadmap (short)
+- Add additional provider adapters (Anthropic, local LLMs, cloud TTLs).
+- Expand plugin checks (SCA, SAST integrations).
+- Add an official hosted demo and deployable template for enterprise installs.
+
+Troubleshooting
+- No diff found? Ensure base and head refs are correct.
+- Missing PR env vars? The Action sets these automatically — for local posting, set PR_REPO_OWNER, PR_REPO_NAME, PR_NUMBER.
+- LLM errors: check model and API key limits; fall back to dry-run to test locally.
+
+Support & Contact
+- Open an issue or discussion in this repo.
+- For partnership or demo requests, open an issue titled "demo / partnership".
+
+Acknowledgements
+- Inspired by community tools around automating reviews, and built to be open, auditable, and extensible.
 
 License
-- MIT
-```
+MIT — see LICENSE.
+
+Thanks for trying pr-reviewer-ai — if this saves you a few minutes on a PR, consider starring the repo to help others discover it!
