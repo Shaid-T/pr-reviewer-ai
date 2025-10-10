@@ -1,6 +1,10 @@
 
 # pr-reviewer-ai 🚀
-
+<p align="center">
+  <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExb25wdG83eDZ1dWh2a2hhZ3VkbWpueXY5ZXRpN2t3eGtwZDEzOHpudyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/RpfIXomvjCh8I/giphy.gif" alt="Glowing Star" width="100">
+  <br>
+  <b>⭐ Please Star this Repo if You Enjoy It! ⭐</b>
+</p>
 [![Stars](https://img.shields.io/github/stars/Shaid-T/pr-reviewer-ai?style=social)](https://github.com/Shaid-T/pr-reviewer-ai/stargazers)
 [![Build](https://img.shields.io/github/actions/workflow/status/Shaid-T/pr-reviewer-ai/ci.yml?branch=main)](https://github.com/Shaid-T/pr-reviewer-ai/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
