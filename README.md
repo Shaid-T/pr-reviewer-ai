@@ -1,14 +1,5 @@
 
 
-
-Demo
-![demo gif placeholder](./assets/demo.gif)
-
-TL;DR — Try it in 60 seconds
-1. Add the Action example workflow (see /examples/pr-review.yml).
-2. (Optional) Add OPENAI_API_KEY secret to your repo for live LLM suggestions.
-3. Open a PR — the Action will run and post a summary (or produce an artifact).
-
 Quickstart — GitHub Action (recommended)
 1. Create a workflow file at .github/workflows/pr-review.yml with this minimal example:
 ```yaml
